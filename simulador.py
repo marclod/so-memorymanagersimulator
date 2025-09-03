@@ -2,7 +2,29 @@ import random
 import time
 import math
 from memoria import criar_memoria, imprimir_memoria, contar_ocupacao
-from algoritmos import first_fit, liberar_aleatorio
+from algoritmos import first_fit, best_fit, worst_fit, liberar_aleatorio
+
+def escolher_algoritmo(memoria):
+    usados = contar_ocupacao(memoria)
+    ocupacao = (usados / 128) * 100
+
+    if ocupacao < 40:
+        return "first_fit"
+    elif ocupacao < 75:
+        return "best_fit"
+    else:
+        return "worst_fit"
+
+def aplicar_algoritmo(memoria, tamanho, processo_id):
+    algoritmo = escolher_algoritmo(memoria)
+    print(f"➡ Usando {algoritmo} para alocar processo {processo_id}")
+
+    if algoritmo == "first_fit":
+        return first_fit(memoria, tamanho, processo_id)
+    elif algoritmo == "best_fit":
+        return best_fit(memoria, tamanho, processo_id)
+    elif algoritmo == "worst_fit":
+        return worst_fit(memoria, tamanho, processo_id)
 
 def simulador(tempo_exec=60):
     memoria = criar_memoria()
@@ -24,7 +46,7 @@ def simulador(tempo_exec=60):
             tamanho = math.ceil(kb / 2)  # cada nó = 2KB
             print(f"\nNovo processo {processo_id} pede {kb} KB -> {tamanho} nos necessarios")
 
-        sucesso = first_fit(memoria, tamanho, processo_id)
+        sucesso = aplicar_algoritmo(memoria, tamanho, processo_id)
 
         if not sucesso:
             print(f"Sem espaco! Removendo processo aleatorio...")
